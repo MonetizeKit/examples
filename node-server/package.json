@@ -1,0 +1,22 @@
+{
+  "name": "@monetizekit-examples/node-server",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "MonetizeKit @monetizekit/node examples: classic-SaaS paywall + AI credits purchasing gates.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "start:saas": "tsx src/classic-saas-paywall.ts",
+    "start:ai": "tsx src/ai-usage-credits.ts"
+  },
+  "dependencies": {
+    "@monetizekit/node": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

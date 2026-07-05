@@ -1,0 +1,16 @@
+version: 2
+updates:
+  # Keep each example's dependencies (MonetizeKit SDKs + framework deps) current.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      monetizekit:
+        patterns:
+          - "@monetizekit/*"
+    open-pull-requests-limit: 10
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly

@@ -1,0 +1,16 @@
+{
+  "name": "@monetizekit/examples",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Official MonetizeKit examples across multiple frameworks, kept aligned with the latest SDKs, components, and APIs via CI.",
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "sdk:latest": "pnpm -r --loglevel=info update \"@monetizekit/*@latest\""
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

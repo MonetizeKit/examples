@@ -1,0 +1,55 @@
+name: SDK alignment
+
+# Keeps the examples continuously aligned with the latest published MonetizeKit
+# SDKs + components: every day it bumps `@monetizekit/*` to `@latest`, validates
+# that all examples still typecheck and build against them, and opens a PR with
+# the update. A failing run is an early signal that a new SDK/API release broke
+# an example.
+
+on:
+  schedule:
+    - cron: "0 7 * * *" # daily 07:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump-and-validate:
+    name: Bump @monetizekit/* to latest + validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Bump @monetizekit/* to @latest
+        run: pnpm sdk:latest
+
+      - name: Re-install (refresh lockfile)
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Typecheck + build against latest SDKs
+        run: |
+          pnpm typecheck
+          pnpm build
+
+      - name: Open a PR with the SDK bump (if anything changed)
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: align examples with latest @monetizekit/* SDKs"
+          title: "chore: align examples with latest @monetizekit/* SDKs"
+          body: |
+            Automated SDK alignment: bumped `@monetizekit/*` to `@latest` and
+            verified every example still typechecks and builds.
+          branch: automation/sdk-alignment
+          delete-branch: true
