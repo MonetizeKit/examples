@@ -6,13 +6,13 @@
  * `entitlements.check(customerId, featureKey)` at the gate and renders/executes
  * based on `effectiveValue`.
  *
- *   MONETIZEKIT_API_KEY=mk_live_xxx MONETIZEKIT_BASE_URL=https://app.monetizekit.app \
+ *   MONETIZEKIT_API_KEY=mk_live_xxx NEXT_PUBLIC_MONETIZEKIT_API_BASE_URL=https://app.monetizekit.app \
  *     pnpm --filter @monetizekit-examples/node-server start:saas
  */
 import { MonetizeKit } from "@monetizekit/node";
 
 const API_KEY = process.env.MONETIZEKIT_API_KEY ?? "mk_live_demo_key";
-const BASE_URL = process.env.MONETIZEKIT_BASE_URL ?? "https://app.monetizekit.app";
+const BASE_URL = process.env.NEXT_PUBLIC_MONETIZEKIT_API_BASE_URL ?? "https://app.monetizekit.app";
 
 interface PlanEntitlement {
   featureKey: string;

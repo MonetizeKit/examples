@@ -31,6 +31,6 @@ cp .env.example .env.local   # set your secret key
 pnpm --filter @monetizekit-examples/saas-taskflow dev
 ```
 
-Point `MONETIZEKIT_BASE_URL` at your instance and use a secret (`mk_*`) key for
+Point `NEXT_PUBLIC_MONETIZEKIT_API_BASE_URL` at your instance and use a secret (`mk_*`) key for
 a workspace whose catalog has the Example Product plans + add-ons (the
 `MonetizeKit Examples` workspace ships them out of the box).

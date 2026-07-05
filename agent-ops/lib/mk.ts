@@ -3,7 +3,7 @@
  * browser). All monetization state lives in MonetizeKit; this app stores only a
  * session cookie referencing the demo customer.
  */
-const BASE_URL = process.env.MONETIZEKIT_BASE_URL ?? "https://app.monetizekit.app";
+const BASE_URL = process.env.NEXT_PUBLIC_MONETIZEKIT_API_BASE_URL ?? "https://app.monetizekit.app";
 const API_KEY = process.env.MONETIZEKIT_EXAMPLES_API_KEY ?? process.env.MONETIZEKIT_API_KEY ?? "";
 // The MonetizeKit dashboard's non-production stages (dev/delivery) sit behind
 // Vercel Deployment Protection (SSO). This automation-bypass token lets a

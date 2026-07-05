@@ -11,10 +11,10 @@ Two purchasing-gate scenarios using the MonetizeKit server SDK.
 
 ```bash
 pnpm install
-MONETIZEKIT_API_KEY=mk_live_xxx MONETIZEKIT_BASE_URL=https://app.monetizekit.app \
+MONETIZEKIT_API_KEY=mk_live_xxx NEXT_PUBLIC_MONETIZEKIT_API_BASE_URL=https://app.monetizekit.app \
   pnpm --filter @monetizekit-examples/node-server start:saas
 ```
 
 Create a secret API key in the MonetizeKit dashboard (Settings → API keys). The
-default `MONETIZEKIT_BASE_URL` is `https://app.monetizekit.app`; point it at your
+default `NEXT_PUBLIC_MONETIZEKIT_API_BASE_URL` is `https://app.monetizekit.app`; point it at your
 own instance (e.g. `http://localhost:3000`) as needed.
