@@ -44,7 +44,7 @@ jobs:
           pnpm build
 
       - name: Open a PR with the SDK bump (if anything changed)
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: "chore: align examples with latest @monetizekit/* SDKs"
           title: "chore: align examples with latest @monetizekit/* SDKs"
