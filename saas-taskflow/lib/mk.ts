@@ -5,6 +5,11 @@
  */
 const BASE_URL = process.env.MONETIZEKIT_BASE_URL ?? "https://app.monetizekit.app";
 const API_KEY = process.env.MONETIZEKIT_EXAMPLES_API_KEY ?? process.env.MONETIZEKIT_API_KEY ?? "";
+// The MonetizeKit dashboard's non-production stages (dev/delivery) sit behind
+// Vercel Deployment Protection (SSO). This automation-bypass token lets a
+// server-to-server call through without a human SSO session — it is never
+// exposed to the browser. Unset (and unnecessary) in production.
+const PROTECTION_BYPASS = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 
 export class MkError extends Error {
   constructor(
@@ -25,6 +30,12 @@ export async function mk<T = unknown>(
     headers: {
       Authorization: `Bearer ${API_KEY}`,
       "Content-Type": "application/json",
+      ...(PROTECTION_BYPASS
+        ? {
+            "x-vercel-protection-bypass": PROTECTION_BYPASS,
+            "x-vercel-set-bypass-cookie": "true",
+          }
+        : {}),
     },
     body: init?.body !== undefined ? JSON.stringify(init.body) : undefined,
     cache: "no-store",
