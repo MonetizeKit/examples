@@ -30,12 +30,12 @@ export async function mk<T = unknown>(
     headers: {
       Authorization: `Bearer ${API_KEY}`,
       "Content-Type": "application/json",
-      ...(PROTECTION_BYPASS
-        ? {
-            "x-vercel-protection-bypass": PROTECTION_BYPASS,
-            "x-vercel-set-bypass-cookie": "true",
-          }
-        : {}),
+      // NOTE: deliberately omit `x-vercel-set-bypass-cookie` — that flag puts
+      // Vercel into a redirect-and-set-cookie flow meant for a persistent
+      // browser cookie jar. A stateless server `fetch()` has no cookie jar
+      // across requests, so the header alone (which bypasses inline, no
+      // redirect) is what actually works here.
+      ...(PROTECTION_BYPASS ? { "x-vercel-protection-bypass": PROTECTION_BYPASS } : {}),
     },
     body: init?.body !== undefined ? JSON.stringify(init.body) : undefined,
     cache: "no-store",
