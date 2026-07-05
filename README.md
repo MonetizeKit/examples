@@ -9,10 +9,12 @@ checks entitlement/credit state and allows or blocks access.
 
 ## Examples
 
-| Framework | Path | What it shows |
-|-----------|------|---------------|
-| **Node (server SDK)** | [`node-server/`](./node-server) | `@monetizekit/node` — classic-SaaS feature paywall + AI text-gen credits gate. |
-| **Next.js (App Router)** | [`nextjs/`](./nextjs) | `@monetizekit/react` — live `PricingTable` + entitlement-gated feature (`Paywall`). |
+| Example | Path | What it shows |
+|---------|------|---------------|
+| **TaskFlow** — complete standard-feature SaaS | [`saas-taskflow/`](./saas-taskflow) | Full lifecycle: signup → trial → subscribe → feature/limit gating → **add-ons** (entitlement deltas) → upgrade/downgrade → cancel. |
+| **AgentOps** — complete volume/agent application | [`agent-ops/`](./agent-ops) | Per-agent **entities**, pre-flight checks, dimensional usage metering, per-agent **deny budgets**, per-model **credit** debits + top-ups, spend breakdowns. |
+| **Node (server SDK)** | [`node-server/`](./node-server) | `@monetizekit/node` — minimal classic-SaaS paywall + AI credits gate scripts. |
+| **Next.js widgets** | [`nextjs/`](./nextjs) | `@monetizekit/react` — drop-in `PricingTable` + `Paywall` components. |
 
 More frameworks (React/Vite, plain-HTML embed, and others) can be added as
 sibling workspace packages — see [Adding an example](#adding-an-example).

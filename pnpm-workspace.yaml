@@ -1,3 +1,5 @@
 packages:
   - "node-server"
   - "nextjs"
+  - "saas-taskflow"
+  - "agent-ops"
