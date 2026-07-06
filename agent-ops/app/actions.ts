@@ -27,11 +27,18 @@ interface Entity {
  * Provision a demo fleet: a customer, two agent entities, a **deny** budget on
  * agent-1 (hard limit of actions per month), and a starter credit pack.
  */
+/** Marker written at creation and required before any delete (see resetFleet). */
+const DEMO_MARKER = { demoApp: "agentops" } as const;
+
 export async function provisionFleet() {
   const suffix = Date.now();
   const customer = await mk<{ id: string }>("/customers", {
     method: "POST",
-    body: { name: `AgentOps Fleet ${suffix}`, email: `agent-fleet-${suffix}@example.com` },
+    body: {
+      name: `AgentOps Fleet ${suffix}`,
+      email: `agent-fleet-${suffix}@example.com`,
+      attributes: DEMO_MARKER,
+    },
   });
 
   const meters = await mk<{ data: Meter[] }>("/catalog/meters");
@@ -79,9 +86,27 @@ export async function provisionFleet() {
   redirect("/console");
 }
 
+/**
+ * Reset — deletes the session's fleet customer. Defense in depth against
+ * abuse: the customer id comes from an HMAC-signed cookie (unforgeable), and
+ * the server re-verifies the target is a record THIS app created (demo marker
+ * + @example.com email) before deleting. Anything else is left untouched.
+ */
 export async function resetFleet() {
   const fleet = await getFleet();
-  if (fleet) await mk(`/customers/${fleet.customerId}`, { method: "DELETE" }).catch(() => {});
+  if (fleet) {
+    try {
+      const customer = await mk<{ email: string; attributes?: Record<string, unknown> }>(
+        `/customers/${fleet.customerId}`,
+      );
+      const isDemoRecord =
+        customer.attributes?.demoApp === DEMO_MARKER.demoApp &&
+        customer.email.endsWith("@example.com");
+      if (isDemoRecord) await mk(`/customers/${fleet.customerId}`, { method: "DELETE" });
+    } catch {
+      // Customer already gone or unreadable — clearing the session is enough.
+    }
+  }
   await clearFleet();
   redirect("/");
 }

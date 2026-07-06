@@ -34,21 +34,46 @@ interface Plan {
   trialDays: number | null;
 }
 
+/** Marker written at creation and required before any delete (see resetDemo). */
+const DEMO_MARKER = { demoApp: "taskflow" } as const;
+
 /** 1. Sign up — create a demo customer (no plan yet: everything gated). */
 export async function createDemoAccount(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim() || `Demo ${Date.now()}`;
   const customer = await mk<Customer>("/customers", {
     method: "POST",
-    body: { name, email: `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}@example.com` },
+    body: {
+      name,
+      email: `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}@example.com`,
+      attributes: DEMO_MARKER,
+    },
   });
   await setCustomerId(customer.id);
   await setMembers([name]);
   redirect("/pricing");
 }
 
+/**
+ * Reset — deletes the session's demo customer. Defense in depth against abuse:
+ * the customer id comes from an HMAC-signed cookie (unforgeable), and the
+ * server re-verifies the target is a record THIS app created (demo marker +
+ * @example.com email) before deleting. Anything else is left untouched.
+ */
 export async function resetDemo() {
   const customerId = await getCustomerId();
-  if (customerId) await mk(`/customers/${customerId}`, { method: "DELETE" }).catch(() => {});
+  if (customerId) {
+    try {
+      const customer = await mk<Customer & { attributes?: Record<string, unknown> }>(
+        `/customers/${customerId}`,
+      );
+      const isDemoRecord =
+        customer.attributes?.demoApp === DEMO_MARKER.demoApp &&
+        customer.email.endsWith("@example.com");
+      if (isDemoRecord) await mk(`/customers/${customerId}`, { method: "DELETE" });
+    } catch {
+      // Customer already gone or unreadable — clearing the session is enough.
+    }
+  }
   await clearSession();
   redirect("/");
 }
