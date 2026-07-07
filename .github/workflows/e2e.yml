@@ -1,0 +1,100 @@
+name: E2E lifecycle gate
+
+# W6 mandatory purchasing/usage lifecycle gate.
+#
+# Drives the deployed example apps (TaskFlow + AgentOps) end to end against the
+# delivery tier so a broken purchasing/usage flow is caught before customers see
+# it. Advisory for now (nightly + on-demand); promote it to a required
+# promotion gate on the release train once it has proven stable across runs.
+#
+# Secrets/vars come from the `Delivery` GitHub Environment (synced from Phase):
+#   - VERCEL_AUTOMATION_BYPASS_SECRET: lets Playwright load the protected
+#     delivery deployments (sent as x-vercel-protection-bypass).
+#   - MONETIZEKIT_EXAMPLES_API_KEY: used only by the backstop sweep job.
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # nightly, 08:00 UTC (after the 07:00 SDK-alignment job)
+  workflow_dispatch:
+    inputs:
+      taskflow_base_url:
+        description: "Override TaskFlow base URL (defaults to the delivery tier)"
+        required: false
+      agentops_base_url:
+        description: "Override AgentOps base URL (defaults to the delivery tier)"
+        required: false
+
+concurrency:
+  group: e2e-lifecycle-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  lifecycle:
+    name: Full-lifecycle E2E (delivery)
+    runs-on: ubuntu-latest
+    environment: Delivery
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm test:e2e:install
+
+      - name: Run lifecycle specs
+        run: pnpm test:e2e
+        env:
+          TASKFLOW_BASE_URL: ${{ inputs.taskflow_base_url }}
+          AGENTOPS_BASE_URL: ${{ inputs.agentops_base_url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          # Unique per attempt so re-runs never collide with prior demo records.
+          E2E_RUN_ID: gha-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+  # Backstop cleanup: archives any demo customer a killed/cancelled run left
+  # behind. Runs after every lifecycle run (better hygiene than a weekly-only
+  # sweep) and is safe/idempotent — it only ever touches this suite's demo
+  # records (demo marker + @example.com email).
+  sweep:
+    name: Demo-data sweep (backstop)
+    runs-on: ubuntu-latest
+    environment: Delivery
+    needs: [lifecycle]
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Sweep leftover demo customers
+        run: pnpm sweep:demo
+        env:
+          MONETIZEKIT_EXAMPLES_API_KEY: ${{ secrets.MONETIZEKIT_EXAMPLES_API_KEY }}
+          NEXT_PUBLIC_MONETIZEKIT_API_BASE_URL: https://app.monetizekit.delivery
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          SWEEP_MAX_AGE_MINUTES: "60"
