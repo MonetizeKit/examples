@@ -7,10 +7,22 @@
   "scripts": {
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
+    "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
     "lint": "pnpm -r lint",
-    "sdk:latest": "pnpm -r --loglevel=info update \"@monetizekit/*@latest\""
+    "sdk:latest": "pnpm -r --loglevel=info update \"@monetizekit/*@latest\"",
+    "test:e2e": "playwright test -c e2e/playwright.config.ts",
+    "test:e2e:taskflow": "playwright test -c e2e/playwright.config.ts --project=taskflow",
+    "test:e2e:agentops": "playwright test -c e2e/playwright.config.ts --project=agentops",
+    "test:e2e:install": "playwright install --with-deps chromium",
+    "sweep:demo": "tsx scripts/sweep-demo-customers.ts"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^22.20.0",
+    "tsx": "^4.23.0",
+    "typescript": "^5.9.3"
   }
 }
