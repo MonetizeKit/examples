@@ -1,0 +1,26 @@
+{
+    "findings": [
+        {
+            "severity": "medium",
+            "location": ".github/workflows/e2e.yml",
+            "title": "Workflow dispatch inputs enable SSRF-based exfiltration of VERCEL_AUTOMATION_BYPASS_SECRET",
+            "description": "The E2E workflow (e2e.yml) accepts user-controlled URL inputs via workflow_dispatch (taskflow_base_url, agentops_base_url) and passes them as environment variables to the Playwright test runner. The Playwright configuration attaches VERCEL_AUTOMATION_BYPASS_SECRET as an HTTP header (x-vercel-protection-bypass) to ALL outbound requests via extraHTTPHeaders. When a repository collaborator triggers the workflow with a malicious URL pointing to an attacker-controlled server, Playwright sends the secret in the request headers to that server.",
+            "impact": "A repository collaborator with write access can exfiltrate the VERCEL_AUTOMATION_BYPASS_SECRET. With this secret, the attacker can bypass Vercel Deployment Protection on the delivery-tier deployments, gaining unauthenticated access to protected non-production applications without requiring SSO.",
+            "verified": true,
+            "status": "active",
+            "background_composer_id": "bc-0b41e1e5-1852-4bb1-a779-b0c16c2a4095",
+            "commit_hash": "cc520679d6063f142d1eeddc2bd9c43cd13dea2e",
+            "detected_at_pst": "2026-07-27T10:46:47-07:00",
+            "reported_link": "",
+            "attack_path": "1. Attacker with repo write access triggers workflow_dispatch on the e2e.yml workflow\n2. Sets taskflow_base_url input to https://attacker-controlled-server.com\n3. The lifecycle job runs in the Delivery environment, injecting VERCEL_AUTOMATION_BYPASS_SECRET into the runner\n4. Playwright config reads the secret into extraHTTPHeaders and the attacker URL into baseURL\n5. Playwright navigates to the attacker server, sending x-vercel-protection-bypass header with the secret value\n6. Attacker captures the secret from incoming request headers\n7. Attacker uses the secret to bypass Vercel Deployment Protection on delivery-tier apps",
+            "evidence": [
+                ".github/workflows/e2e.yml:54-57",
+                "e2e/playwright.config.ts:20-21",
+                "e2e/playwright.config.ts:26-30",
+                "e2e/playwright.config.ts:32"
+            ],
+            "remediation": "Validate workflow_dispatch URL inputs against an allowlist of trusted domains before passing them to the test runner. Alternatively, only attach the bypass header when the target URL matches a known MonetizeKit/Vercel deployment pattern (e.g., *.monetizekit.delivery). A simple fix in playwright.config.ts:\n\n```typescript\nconst TRUSTED_HOSTS = ['monetizekit.delivery', 'monetizekit.app', 'localhost'];\nconst isTrusted = (url: string) => TRUSTED_HOSTS.some(h => new URL(url).hostname.endsWith(h));\nconst extraHTTPHeaders = bypass && isTrusted(taskflowUrl) ? { \"x-vercel-protection-bypass\": bypass } : undefined;\n```",
+            "poc_video_notes": "A PoC video is not feasible because exploitation requires triggering a GitHub Actions workflow_dispatch with secrets from the Delivery environment, which cannot be safely demonstrated without access to the repository secrets and environment."
+        }
+    ]
+}
