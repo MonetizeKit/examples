@@ -12,8 +12,8 @@ importers:
         specifier: ^1.61.1
         version: 1.61.1
       '@types/node':
-        specifier: ^22.20.0
-        version: 22.20.0
+        specifier: ^22.20.2
+        version: 22.20.2
       tsx:
         specifier: ^4.23.0
         version: 4.23.0
@@ -34,8 +34,8 @@ importers:
         version: 19.2.7(react@19.2.7)
     devDependencies:
       '@types/node':
-        specifier: ^22.10.0
-        version: 22.20.0
+        specifier: ^22.20.2
+        version: 22.20.2
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.17
@@ -62,8 +62,8 @@ importers:
         version: 19.2.7(react@19.2.7)
     devDependencies:
       '@types/node':
-        specifier: ^22.10.0
-        version: 22.20.0
+        specifier: ^22.20.2
+        version: 22.20.2
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.17
@@ -81,8 +81,8 @@ importers:
         version: 0.1.0
     devDependencies:
       '@types/node':
-        specifier: ^22.10.0
-        version: 22.20.0
+        specifier: ^22.20.2
+        version: 22.20.2
       tsx:
         specifier: ^4.19.2
         version: 4.23.0
@@ -103,8 +103,8 @@ importers:
         version: 19.2.7(react@19.2.7)
     devDependencies:
       '@types/node':
-        specifier: ^22.10.0
-        version: 22.20.0
+        specifier: ^22.20.2
+        version: 22.20.2
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.17
@@ -505,8 +505,8 @@ packages:
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
 
-  '@types/node@22.20.0':
-    resolution: {integrity: sha512-QWlFW2wf3nTjC13/DqRnBpR4ZO36VJH/JVBkA/vcnmbTBNQIlnObqyqZE1tUR7+Ni23Lda8R1BxMfbXRpCUx5g==}
+  '@types/node@22.20.2':
+    resolution: {integrity: sha512-xlvWf4Vs9n1PEVYwP1n4vvG07M6y8WgvJ2t0vbrWTmijsIHp1cS+uJ2kMIRdY3nHZK0nCYKrPeD171+SzF4/zw==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -868,7 +868,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@types/node@22.20.0':
+  '@types/node@22.20.2':
     dependencies:
       undici-types: 6.21.0
 
