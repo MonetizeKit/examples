@@ -29,7 +29,41 @@ pnpm install        # install all examples
 pnpm typecheck      # typecheck every example
 pnpm build          # build every example (Node SDK + Next.js)
 pnpm sdk:latest     # bump every example to the latest @monetizekit/* SDKs
+pnpm test:e2e       # run the full-lifecycle E2E gate (see below)
 ```
+
+## Lifecycle E2E gate
+
+`e2e/` holds the mandatory **purchasing/usage lifecycle gate**: Playwright specs
+that drive the deployed TaskFlow and AgentOps apps end to end against the live
+MonetizeKit API, so a broken flow is caught before customers see it.
+
+- `e2e/taskflow.lifecycle.spec.ts` — signup -> subscribe Free -> seat/analytics
+  gating -> add-on compatibility gate -> upgrade to Pro -> attach/detach add-on
+  -> switch to Scale -> downgrade to Pro -> cancel.
+- `e2e/agent-ops.lifecycle.spec.ts` — provision fleet -> per-agent deny budget
+  -> credit exhaustion -> credit top-up -> per-model usage breakdown.
+
+```bash
+# Against the deployed delivery tier (default). Protected deployments need a
+# bypass token:
+VERCEL_AUTOMATION_BYPASS_SECRET=... pnpm test:e2e:install && pnpm test:e2e
+
+# Against a specific deployment:
+TASKFLOW_BASE_URL=https://taskflow.monetizekit.dev \
+AGENTOPS_BASE_URL=https://agentops.monetizekit.dev pnpm test:e2e
+
+# Locally (spins up both apps via next dev on ports 3100/3200; the apps still
+# need MONETIZEKIT_EXAMPLES_API_KEY + NEXT_PUBLIC_MONETIZEKIT_API_BASE_URL):
+E2E_LOCAL=1 pnpm test:e2e
+```
+
+Each spec archives its own demo customer on teardown ("Reset demo"), and
+`scripts/sweep-demo-customers.ts` (`pnpm sweep:demo`) is the backstop that
+reconciles anything a killed run left behind — so a cancelled run can never
+accumulate demo state. CI runs both nightly via
+[`.github/workflows/e2e.yml`](.github/workflows/e2e.yml) and on demand
+(`workflow_dispatch`).
 
 ## Staying aligned (CI/CD)
 
@@ -41,6 +75,9 @@ pnpm sdk:latest     # bump every example to the latest @monetizekit/* SDKs
   release broke an example.
 - **Dependabot** (`.github/dependabot.yml`) — weekly dependency + GitHub Actions
   updates as a safety net, grouping the `@monetizekit/*` packages together.
+- **`E2E lifecycle gate`** (`.github/workflows/e2e.yml`) — nightly + on-demand
+  Playwright run of the full purchasing/usage lifecycle against the delivery
+  tier, with an automatic demo-data sweep afterwards.
 
 ## Adding an example
 
