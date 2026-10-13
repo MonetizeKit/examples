@@ -20,7 +20,12 @@ jobs:
     name: Bump @monetizekit/* to latest + validate
     runs-on: ubuntu-latest
     steps:
+      # Scheduled runs start on the default branch (main). The alignment PR
+      # must be cut from, and target, development so it walks the promotion
+      # chain; promotion-guard rejects any other PR into main.
       - uses: actions/checkout@v4
+        with:
+          ref: development
 
       - uses: pnpm/action-setup@v4
 
@@ -52,4 +57,5 @@ jobs:
             Automated SDK alignment: bumped `@monetizekit/*` to `@latest` and
             verified every example still typechecks and builds.
           branch: automation/sdk-alignment
+          base: development
           delete-branch: true
