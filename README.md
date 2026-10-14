@@ -92,3 +92,7 @@ accumulate demo state. CI runs both nightly via
 Examples read a MonetizeKit **publishable** key (`pk_*`, browser-safe) or a
 **secret** key (`mk_*`, server-only) plus your API base URL (default
 `https://app.monetizekit.app`). See each example's README / `.env.example`.
+
+## License
+
+MIT © [Coordinated App LLC](https://monetizekit.com), d/b/a MonetizeKit — copy freely into your own projects. See [LICENSE](./LICENSE).
